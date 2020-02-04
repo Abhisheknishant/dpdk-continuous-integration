@@ -178,3 +178,9 @@ matrix:
           - *doc_packages
 
 script: ./.ci/${TRAVIS_OS_NAME}-build.sh
+
+notifications:
+  email:
+    recipients:
+      - wilder@us.ibm.com
+

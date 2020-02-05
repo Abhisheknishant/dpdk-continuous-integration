@@ -189,12 +189,5 @@ matrix:
          packages:
            - *required_packages
            - *doc_packages
-   - env: DEF_LIB="shared" EXTRA_PACKAGES=1 ABI_CHECKS=1
-     arch: ppc64le
-     compiler: gcc
-     addons:
-       apt:
-         packages:
-           - *extra_packages
 
 script: ./.ci/${TRAVIS_OS_NAME}-build.sh

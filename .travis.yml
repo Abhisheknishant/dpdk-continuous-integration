@@ -181,13 +181,5 @@ matrix:
        apt:
          packages:
            - *required_packages
-   - env: DEF_LIB="shared" OPTS="-Denable_kmods=false" BUILD_DOCS=1
-     arch: ppc64le
-     compiler: gcc
-     addons:
-       apt:
-         packages:
-           - *required_packages
-           - *doc_packages
 
 script: ./.ci/${TRAVIS_OS_NAME}-build.sh

@@ -119,7 +119,7 @@ matrix:
         packages:
           - *extra_packages
   - env: DEF_LIB="static"
-    arch: arm64
+    arch: ppc64le
     compiler: gcc
     addons:
       apt:
@@ -160,12 +160,5 @@ matrix:
       apt:
         packages:
           - *extra_packages
-   - env: DEF_LIB="static"
-     arch: ppc64le
-     compiler: gcc
-     addons:
-       apt:
-         packages:
-           - *required_packages
 
 script: ./.ci/${TRAVIS_OS_NAME}-build.sh

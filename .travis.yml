@@ -119,7 +119,7 @@ matrix:
         packages:
           - *extra_packages
   - env: DEF_LIB="static"
-    arch: ppc64le
+    arch: arm64
     compiler: gcc
     addons:
       apt:
@@ -155,6 +155,42 @@ matrix:
           - *required_packages
           - *doc_packages
   - env: DEF_LIB="shared" EXTRA_PACKAGES=1 ABI_CHECKS=1
+    compiler: gcc
+    addons:
+      apt:
+        packages:
+          - *extra_packages
+  - env: DEF_LIB="shared" EXTRA_PACKAGES=1 ABI_CHECKS=1
+    arch: arm64
+    compiler: gcc
+    addons:
+      apt:
+        packages:
+          - *extra_packages
+  - env: DEF_LIB="static"
+    arch: ppc64le
+    compiler: gcc
+    addons:
+      apt:
+        packages:
+          - *required_packages
+  - env: DEF_LIB="shared"
+    arch: ppc64le
+    compiler: gcc
+    addons:
+      apt:
+        packages:
+          - *required_packages
+  - env: DEF_LIB="shared" OPTS="-Denable_kmods=false" BUILD_DOCS=1
+    arch: ppc64le
+    compiler: gcc
+    addons:
+      apt:
+        packages:
+          - *required_packages
+          - *doc_packages
+  - env: DEF_LIB="shared" EXTRA_PACKAGES=1 ABI_CHECKS=1
+    arch: ppc64le
     compiler: gcc
     addons:
       apt:

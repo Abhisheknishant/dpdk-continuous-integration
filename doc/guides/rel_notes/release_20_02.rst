@@ -130,6 +130,14 @@ New Features
   * ECPM (Elliptic Curve Point Multiplication) is added to
     asymmetric crypto library specifications.
 
+* **Added synchronous Crypto burst API.**
+
+  A new API is introduced in crypto library to handle synchronous cryptographic
+  operations allowing to achieve performance gain for cryptodevs which use
+  CPU based acceleration, such as Intel AES-NI. An implementation for aesni_gcm
+  cryptodev is provided. The IPsec example application and ipsec library itself
+  were changed to allow utilization of this new feature.
+
 * **Added handling of mixed algorithms in encrypted digest requests in QAT PMD.**
 
   Added handling of mixed algorithms in encrypted digest hash-cipher
@@ -137,6 +145,38 @@ New Features
   ZUC + AES CTR) in QAT PMD possible when running on GEN3 QAT hardware.
   Such algorithm combinations are not supported on GEN1/GEN2 hardware
   and executing the request returns RTE_CRYPTO_OP_STATUS_INVALID_SESSION.
+
+* **Updated the ZUC PMD.**
+
+  * Transistioned underlying library from libSSO ZUC to intel-ipsec-mb
+    library (minimum version required 0.53).
+  * Removed dynamic library limitation, so PMD can be built as a shared
+    object now.
+
+* **Updated the KASUMI PMD.**
+
+  * Transistioned underlying library from libSSO KASUMI to intel-ipsec-mb
+    library (minimum version required 0.53).
+
+* **Updated the SNOW3G PMD.**
+
+  * Transistioned underlying library from libSSO SNOW3G to intel-ipsec-mb
+    library (minimum version required 0.53).
+
+* **Changed armv8 crypto PMD external dependency.**
+
+  armv8 crypto PMD now depends on Arm crypto library, and Marvell's
+  armv8 crypto library is not used anymore. Library name is changed
+  from armv8_crypto to AArch64crypto.
+
+* **Added inline IPsec support to Marvell OCTEON TX2 PMD.**
+
+  Added inline IPsec support to Marvell OCTEON TX2 PMD. With the feature,
+  applications would be able to offload entire IPsec offload to the hardware.
+  For the configured sessions, hardware will do the lookup and perform
+  decryption and IPsec transformation. For the outbound path, application
+  can submit a plain packet to the PMD, and it would be sent out on wire
+  after doing encryption and IPsec transformation of the packet.
 
 * **Added Marvell OCTEON TX2 End Point rawdev PMD.**
 

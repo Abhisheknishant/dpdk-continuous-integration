@@ -130,6 +130,7 @@ F: meson_options.txt
 F: config/rte_config.h
 F: buildtools/call-sphinx-build.py
 F: buildtools/gen-pmdinfo-cfile.sh
+F: buildtools/list-dir-globs.py
 F: buildtools/map_to_def.py
 F: buildtools/symlink-drivers-solibs.sh
 
@@ -727,6 +728,12 @@ T: git://dpdk.org/next/dpdk-next-net-mrvl
 F: drivers/net/octeontx2/
 F: doc/guides/nics/features/octeontx2*.ini
 F: doc/guides/nics/octeontx2.rst
+
+Marvell OCTEON TX2 - security
+M: Anoob Joseph <anoobj@marvell.com>
+T: git://dpdk.org/next/dpdk-next-crypto
+F: drivers/common/octeontx2/otx2_sec*
+F: drivers/net/octeontx2/otx2_ethdev_sec*
 
 Mellanox mlx4
 M: Matan Azrad <matan@mellanox.com>

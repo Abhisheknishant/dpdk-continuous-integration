@@ -12,6 +12,7 @@
 #include <rte_mempool.h>
 
 #include "otx2_ethdev.h"
+#include "otx2_ethdev_sec.h"
 
 static inline uint64_t
 nix_get_rx_offload_capa(struct otx2_eth_dev *dev)
@@ -344,6 +345,10 @@ nix_cq_rq_init(struct rte_eth_dev *eth_dev, struct otx2_eth_dev *dev,
 	aq->op = NIX_AQ_INSTOP_INIT;
 
 	aq->rq.sso_ena = 0;
+
+	if (rxq->offloads & DEV_RX_OFFLOAD_SECURITY)
+		aq->rq.ipsech_ena = 1;
+
 	aq->rq.cq = qid; /* RQ to CQ 1:1 mapped */
 	aq->rq.spb_ena = 0;
 	aq->rq.lpb_aura = npa_lf_aura_handle_to_aura(mp->pool_id);
@@ -629,6 +634,9 @@ nix_rx_offload_flags(struct rte_eth_dev *eth_dev)
 	if ((dev->rx_offloads & DEV_RX_OFFLOAD_TIMESTAMP))
 		flags |= NIX_RX_OFFLOAD_TSTAMP_F;
 
+	if (dev->rx_offloads & DEV_RX_OFFLOAD_SECURITY)
+		flags |= NIX_RX_OFFLOAD_SECURITY_F;
+
 	if (!dev->ptype_disable)
 		flags |= NIX_RX_OFFLOAD_PTYPE_F;
 
@@ -697,6 +705,9 @@ nix_tx_offload_flags(struct rte_eth_dev *eth_dev)
 		flags |= (NIX_TX_OFFLOAD_TSO_F |
 			  NIX_TX_OFFLOAD_OL3_OL4_CSUM_F |
 			  NIX_TX_OFFLOAD_L3_L4_CSUM_F);
+
+	if (conf & DEV_TX_OFFLOAD_SECURITY)
+		flags |= NIX_TX_OFFLOAD_SECURITY_F;
 
 	if ((dev->rx_offloads & DEV_RX_OFFLOAD_TIMESTAMP))
 		flags |= NIX_TX_OFFLOAD_TSTAMP_F;
@@ -1617,6 +1628,7 @@ otx2_nix_configure(struct rte_eth_dev *eth_dev)
 
 	/* Free the resources allocated from the previous configure */
 	if (dev->configured == 1) {
+		otx2_eth_sec_fini(eth_dev);
 		otx2_nix_rxchan_bpid_cfg(eth_dev, false);
 		otx2_nix_vlan_fini(eth_dev);
 		otx2_nix_mc_addr_list_uninstall(eth_dev);
@@ -1727,10 +1739,15 @@ otx2_nix_configure(struct rte_eth_dev *eth_dev)
 		goto cq_fini;
 	}
 
+	/* Enable security */
+	rc = otx2_eth_sec_init(eth_dev);
+	if (rc)
+		goto cq_fini;
+
 	rc = otx2_nix_mc_addr_list_install(eth_dev);
 	if (rc < 0) {
 		otx2_err("Failed to install mc address list rc=%d", rc);
-		goto cq_fini;
+		goto sec_fini;
 	}
 
 	/*
@@ -1766,6 +1783,8 @@ otx2_nix_configure(struct rte_eth_dev *eth_dev)
 
 uninstall_mc_list:
 	otx2_nix_mc_addr_list_uninstall(eth_dev);
+sec_fini:
+	otx2_eth_sec_fini(eth_dev);
 cq_fini:
 	oxt2_nix_unregister_cq_irqs(eth_dev);
 q_irq_fini:
@@ -2250,10 +2269,17 @@ otx2_eth_dev_init(struct rte_eth_dev *eth_dev)
 		dev->hwcap |= OTX2_FIXUP_F_LIMIT_CQ_FULL;
 	}
 
+	/* Create security ctx */
+	rc = otx2_eth_sec_ctx_create(eth_dev);
+	if (rc)
+		goto free_mac_addrs;
+	dev->tx_offload_capa |= DEV_TX_OFFLOAD_SECURITY;
+	dev->rx_offload_capa |= DEV_RX_OFFLOAD_SECURITY;
+
 	/* Initialize rte-flow */
 	rc = otx2_flow_init(dev);
 	if (rc)
-		goto free_mac_addrs;
+		goto sec_ctx_destroy;
 
 	otx2_nix_mc_filter_init(dev);
 
@@ -2264,6 +2290,8 @@ otx2_eth_dev_init(struct rte_eth_dev *eth_dev)
 		     dev->rx_offload_capa, dev->tx_offload_capa);
 	return 0;
 
+sec_ctx_destroy:
+	otx2_eth_sec_ctx_destroy(eth_dev);
 free_mac_addrs:
 	rte_free(eth_dev->data->mac_addrs);
 unregister_irq:
@@ -2346,6 +2374,12 @@ otx2_eth_dev_uninit(struct rte_eth_dev *eth_dev, bool mbox_close)
 	rc = otx2_npa_lf_fini();
 	if (rc)
 		otx2_err("Failed to cleanup npa lf, rc=%d", rc);
+
+	/* Disable security */
+	otx2_eth_sec_fini(eth_dev);
+
+	/* Destroy security ctx */
+	otx2_eth_sec_ctx_destroy(eth_dev);
 
 	rte_free(eth_dev->data->mac_addrs);
 	eth_dev->data->mac_addrs = NULL;

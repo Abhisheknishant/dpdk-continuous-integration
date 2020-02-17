@@ -385,11 +385,12 @@ F: lib/librte_ethdev/rte_flow*
 
 Traffic Management API - EXPERIMENTAL
 M: Cristian Dumitrescu <cristian.dumitrescu@intel.com>
-T: git://dpdk.org/next/dpdk-next-tm
+T: git://dpdk.org/next/dpdk-next-qos
 F: lib/librte_ethdev/rte_tm*
 
 Traffic Metering and Policing API - EXPERIMENTAL
 M: Cristian Dumitrescu <cristian.dumitrescu@intel.com>
+T: git://dpdk.org/next/dpdk-next-qos
 F: lib/librte_ethdev/rte_mtr*
 
 Baseband API - EXPERIMENTAL
@@ -784,7 +785,6 @@ F: doc/guides/nics/features/nfb.ini
 
 Netronome nfp
 M: Heinrich Kuhn <heinrich.kuhn@netronome.com>
-M: Jan Gutter <jan.gutter@netronome.com>
 F: drivers/net/nfp/
 F: doc/guides/nics/nfp.rst
 F: doc/guides/nics/features/nfp*.ini
@@ -1374,6 +1374,7 @@ F: lib/librte_rib/
 F: app/test/test_rib*
 F: lib/librte_fib/
 F: app/test/test_fib*
+F: app/test-fib/
 
 Traffic metering
 M: Cristian Dumitrescu <cristian.dumitrescu@intel.com>

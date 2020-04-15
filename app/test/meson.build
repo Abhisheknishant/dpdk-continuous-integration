@@ -355,7 +355,6 @@ if dpdk_conf.has('RTE_LIBRTE_PDUMP')
 	test_deps += 'pdump'
 endif
 
-cflags = machine_args
 if cc.has_argument('-Wno-format-truncation')
     cflags += '-Wno-format-truncation'
 endif
@@ -393,19 +392,11 @@ dpdk_test = executable('dpdk-test',
 	test_sources,
 	link_whole: link_libs,
 	dependencies: test_dep_objs,
-	c_args: [cflags, '-DALLOW_EXPERIMENTAL_API'],
+	c_args: cflags,
 	install_rpath: driver_install_path,
 	install: true)
 
-has_hugepage = true
-if is_linux
-	check_hugepage = run_command('cat',
-				     '/proc/sys/vm/nr_hugepages')
-	if (check_hugepage.returncode() != 0 or
-	    check_hugepage.stdout().strip() == '0')
-		has_hugepage = false
-	endif
-endif
+has_hugepage = run_command('has-hugepage.sh').stdout().strip() != '0'
 message('hugepage availability: @0@'.format(has_hugepage))
 
 # some perf tests (eg: memcpy perf autotest)take very long

@@ -5,6 +5,8 @@
 #ifndef _PTHREAD_H_
 #define _PTHREAD_H_
 
+#include <stdint.h>
+
 /**
  * This file is required to support the common code in eal_common_proc.c,
  * eal_common_thread.c and common\include\rte_per_lcore.h as Microsoft libc
@@ -15,6 +17,7 @@ extern "C" {
 #endif
 
 #include <windows.h>
+#include <rte_common.h>
 
 #define PTHREAD_BARRIER_SERIAL_THREAD TRUE
 
@@ -80,8 +83,8 @@ eal_create_thread(void *threadid, void *threadfunc, void *args)
 }
 
 static inline int
-pthread_join(pthread_t thread __attribute__((__unused__)),
-	void **value_ptr __attribute__((__unused__)))
+pthread_join(__rte_unused pthread_t thread,
+	__rte_unused void **value_ptr)
 {
 	return 0;
 }

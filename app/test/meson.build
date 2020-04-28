@@ -58,6 +58,7 @@ test_sources = files('commands.c',
 	'test_hash_perf.c',
 	'test_hash_readwrite_lf_perf.c',
 	'test_interrupts.c',
+        'test_ipfrag.c',
 	'test_ipsec.c',
 	'test_ipsec_sad.c',
 	'test_kni.c',
@@ -100,9 +101,15 @@ test_sources = files('commands.c',
 	'test_rib.c',
 	'test_rib6.c',
 	'test_ring.c',
+	'test_ring_mpmc_stress.c',
+	'test_ring_hts_stress.c',
+	'test_ring_peek_stress.c',
 	'test_ring_perf.c',
+	'test_ring_rts_stress.c',
+	'test_ring_stress.c',
 	'test_rwlock.c',
 	'test_sched.c',
+	'test_security.c',
 	'test_service_cores.c',
 	'test_spinlock.c',
 	'test_stack.c',
@@ -121,6 +128,9 @@ test_sources = files('commands.c',
 	'test_timer_racecond.c',
 	'test_timer_secondary.c',
 	'test_ticketlock.c',
+	'test_trace.c',
+	'test_trace_register.c',
+	'test_trace_perf.c',
 	'test_version.c',
 	'virtual_pmd.c'
 )
@@ -150,6 +160,7 @@ test_deps = ['acl',
 	'reorder',
 	'rib',
 	'ring',
+	'security',
 	'stack',
 	'timer'
 ]
@@ -187,6 +198,7 @@ fast_tests = [
         ['flow_classify_autotest', false],
         ['hash_autotest', true],
         ['interrupt_autotest', true],
+        ['ipfrag_autotest', false],
         ['logs_autotest', true],
         ['lpm_autotest', true],
         ['lpm6_autotest', true],
@@ -211,6 +223,7 @@ fast_tests = [
         ['rwlock_rds_wrm_autotest', true],
         ['rwlock_rde_wro_autotest', true],
         ['sched_autotest', true],
+		['security_autotest', false],
         ['spinlock_autotest', true],
         ['stack_autotest', false],
         ['stack_lf_autotest', false],
@@ -237,6 +250,7 @@ fast_tests = [
         ['reorder_autotest', true],
         ['service_autotest', true],
         ['thash_autotest', true],
+        ['trace_autotest', true],
 ]
 
 perf_test_names = [
@@ -272,6 +286,7 @@ perf_test_names = [
         'rand_perf_autotest',
         'hash_readwrite_perf_autotest',
         'hash_readwrite_lf_perf_autotest',
+        'trace_perf_autotest',
 ]
 
 driver_test_names = [

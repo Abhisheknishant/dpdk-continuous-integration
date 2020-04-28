@@ -52,6 +52,7 @@
 #include "eal_hugepages.h"
 #include "eal_options.h"
 #include "eal_memcfg.h"
+#include "eal_trace.h"
 
 #define MEMSIZE_IF_NO_HUGE_PAGE (64ULL * 1024ULL * 1024ULL)
 
@@ -665,7 +666,7 @@ eal_check_mem_on_local_socket(void)
 
 
 static int
-sync_func(__attribute__((unused)) void *arg)
+sync_func(__rte_unused void *arg)
 {
 	return 0;
 }
@@ -747,6 +748,13 @@ rte_eal_init(int argc, char **argv)
 	if (eal_plugins_init() < 0) {
 		rte_eal_init_alert("Cannot init plugins");
 		rte_errno = EINVAL;
+		rte_atomic32_clear(&run_once);
+		return -1;
+	}
+
+	if (eal_trace_init() < 0) {
+		rte_eal_init_alert("Cannot init trace");
+		rte_errno = EFAULT;
 		rte_atomic32_clear(&run_once);
 		return -1;
 	}
@@ -966,6 +974,8 @@ rte_eal_cleanup(void)
 {
 	rte_service_finalize();
 	rte_mp_channel_cleanup();
+	rte_trace_save();
+	eal_trace_fini();
 	eal_cleanup_config(&internal_config);
 	return 0;
 }

@@ -58,6 +58,7 @@
 #include "eal_filesystem.h"
 #include "eal_hugepages.h"
 #include "eal_memcfg.h"
+#include "eal_trace.h"
 #include "eal_options.h"
 #include "eal_vfio.h"
 #include "hotplug_mp.h"
@@ -893,7 +894,7 @@ eal_check_mem_on_local_socket(void)
 }
 
 static int
-sync_func(__attribute__((unused)) void *arg)
+sync_func(__rte_unused void *arg)
 {
 	return 0;
 }
@@ -1012,6 +1013,12 @@ rte_eal_init(int argc, char **argv)
 		return -1;
 	}
 
+	if (eal_trace_init() < 0) {
+		rte_eal_init_alert("Cannot init trace");
+		rte_errno = EFAULT;
+		return -1;
+	}
+
 	if (eal_option_device_parse()) {
 		rte_errno = ENODEV;
 		rte_atomic32_clear(&run_once);
@@ -1084,7 +1091,7 @@ rte_eal_init(int argc, char **argv)
 #if defined(RTE_LIBRTE_KNI) && LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
 			} else if (rte_eal_check_module("rte_kni") == 1) {
 				iova_mode = RTE_IOVA_PA;
-				RTE_LOG(DEBUG, EAL, "KNI is loaded, selecting IOVA as PA mode for better KNI perfomance.\n");
+				RTE_LOG(DEBUG, EAL, "KNI is loaded, selecting IOVA as PA mode for better KNI performance.\n");
 #endif
 			} else if (is_iommu_enabled()) {
 				/* we have an IOMMU, pick IOVA as VA mode */
@@ -1341,6 +1348,8 @@ rte_eal_cleanup(void)
 		rte_memseg_walk(mark_freeable, NULL);
 	rte_service_finalize();
 	rte_mp_channel_cleanup();
+	rte_trace_save();
+	eal_trace_fini();
 	eal_cleanup_config(&internal_config);
 	return 0;
 }

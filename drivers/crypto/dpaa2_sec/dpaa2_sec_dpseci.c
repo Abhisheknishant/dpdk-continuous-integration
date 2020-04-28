@@ -3530,7 +3530,7 @@ void dpaa2_sec_stats_reset(struct rte_cryptodev *dev)
 	}
 }
 
-static void __attribute__((hot))
+static void __rte_hot
 dpaa2_sec_process_parallel_event(struct qbman_swp *swp,
 				 const struct qbman_fd *fd,
 				 const struct qbman_result *dq,
@@ -3556,7 +3556,7 @@ dpaa2_sec_process_parallel_event(struct qbman_swp *swp,
 	qbman_swp_dqrr_consume(swp, dq);
 }
 static void
-dpaa2_sec_process_atomic_event(struct qbman_swp *swp __attribute__((unused)),
+dpaa2_sec_process_atomic_event(struct qbman_swp *swp __rte_unused,
 				 const struct qbman_fd *fd,
 				 const struct qbman_result *dq,
 				 struct dpaa2_queue *rxq,
@@ -3719,10 +3719,6 @@ dpaa2_sec_dev_init(struct rte_cryptodev *cryptodev)
 
 	PMD_INIT_FUNC_TRACE();
 	dpaa2_dev = container_of(dev, struct rte_dpaa2_device, device);
-	if (dpaa2_dev == NULL) {
-		DPAA2_SEC_ERR("DPAA2 SEC device not found");
-		return -1;
-	}
 	hw_id = dpaa2_dev->object_id;
 
 	cryptodev->driver_id = cryptodev_driver_id;
